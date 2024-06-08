@@ -1,0 +1,141 @@
+---
+title: "Global Superstore Data Analysis"
+output: 
+  flexdashboard::flex_dashboard:
+    color: darkly
+    theme: cerulean
+    orientation: rows 
+    vertical_layout: fill
+---
+
+```{css}
+body {
+  background-color: #6D2337;
+}
+```
+
+
+
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(knitr)
+library(ggplot2)
+library(plotly)
+library(dplyr)
+library(ggplot2)
+library(DT)
+```
+
+
+```{r}
+data=read.csv('C://Users//nikhi//Downloads//Global_Superstore.csv')
+
+```
+
+
+
+
+Dashboard
+=======================================================================
+Row
+-----------------------------------------------------------------------
+### Total Orders
+```{r}
+valueBox(paste("Total Customer Orders"),
+         length(data$Order_ID),
+         icon="fa-user",
+         color="#9E6FB6")
+```
+
+### Total Products Ordered
+
+```{r}
+valueBox(paste("Total Products Ordered"),
+         sum(data$Quantity),
+         color="#9E6FB6")
+
+```
+
+### Total Global Sales
+```{r}
+valueBox(paste("Total Global Sales (in USD)"),
+         sum(data$Sales),
+         color="#9E6FB6")
+```
+
+### Average Profit
+```{r}
+valueBox(paste("Average Profit(in USD)"),
+         mean(data$Profit),
+         color="#9E6FB6"
+         )
+```
+
+
+
+Row
+-----------------------------------------------------------------------
+```{r}
+
+ggplot(data,aes(x=Category,y=Sales)) + geom_bar(stat = "identity") + labs(title= " Product Sales according to the Category")
+```
+
+```{r}
+plot_ly(data,x= ~Market , y =~Sales, type = "bar",
+        name="Sales",marker=list(color = "lavender")) 
+```
+
+```{r}
+plot_ly(data, x = ~Quantity, type = "histogram", marker = list(color = "pink")) %>%
+  layout(xaxis = list(title = "Total Quantity"))
+```
+
+Row
+---------------------------------------------------------------------
+```{r}
+plot_ly(data, x = ~Sales, type = "box", marker = list(color = "black")) %>%
+  layout(yaxis = list(title = "Total Sales"))
+```
+
+```{r}
+data$Country=substr(data$Country,1,3)
+average_sales=data%>%group_by(Country)%>%
+  summarise(avg_sales=mean(Sales))
+
+plot=plot_ly(average_sales, x= ~Country, y =~avg_sales, type= "bar",marker=list(color="lightgreen"))
+plot=config(plot,displayModeBar=TRUE)
+
+plot
+```
+
+
+```{r}
+data$Country=substr(data$Country,1,3)
+average_Profit=data%>%group_by(Country)%>%
+  summarise(avg_Profit=mean(Profit))
+
+plot=plot_ly(average_Profit, x= ~Country, y =~avg_Profit, type= "bar",marker=list(color="maroon"))
+plot=config(plot,displayModeBar=TRUE)
+plot
+
+```
+
+
+
+
+Dataset
+=====================================================================
+
+```{r}
+datatable(data)
+```
+
+
+
+
+
+
+
+
+
